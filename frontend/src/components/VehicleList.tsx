@@ -79,12 +79,14 @@ export const VehicleList: React.FC<VehicleListProps> = ({
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!licensePlate.trim()) {
+    const normalizedPlate = licensePlate.replace(/\s+/g, '').toUpperCase()
+    if (!normalizedPlate) {
       return
     }
     setCreating(true)
     try {
-      await onCreate(licensePlate.toUpperCase(), description)
+      const normalizedDescription = description.trim()
+      await onCreate(normalizedPlate, normalizedDescription ? normalizedDescription : undefined)
       setLicensePlate('')
       setDescription('')
       setError(null)
@@ -122,7 +124,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
               <input
                 id="vehicle-search"
                 value={search}
-                onChange={(event) => onSearchChange(event.target.value)}
+                onChange={(event) => onSearchChange(event.target.value.replace(/\s+/g, '').toUpperCase())}
                 className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm"
                 placeholder={t('vehicles.plateFormat')}
               />
@@ -162,7 +164,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
                 <input
                   id="plate-input"
                   value={licensePlate}
-                  onChange={(event) => setLicensePlate(event.target.value)}
+                  onChange={(event) => setLicensePlate(event.target.value.replace(/\s+/g, '').toUpperCase())}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm"
                   placeholder="AB 123 CD"
                 />

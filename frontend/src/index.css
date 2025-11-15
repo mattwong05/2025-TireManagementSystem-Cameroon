@@ -36,6 +36,12 @@ body {
   @apply border-2 border-amber-500 shadow-[0_0_0_1px_rgba(245,158,11,0.2)];
 }
 
+.wheel-size {
+  width: clamp(4rem, 18vw, 7rem);
+  height: clamp(4rem, 18vw, 7rem);
+  flex: 0 0 auto;
+}
+
 .wheel-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

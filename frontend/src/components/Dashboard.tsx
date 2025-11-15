@@ -9,6 +9,8 @@ import { VehicleList } from './VehicleList'
 import { WheelLayout } from './WheelLayout'
 import { WheelDetailPanel } from './WheelDetailPanel'
 
+const normalizeLicensePlate = (value: string): string => value.replace(/\s+/g, '').toUpperCase()
+
 interface FeedbackMessage {
   type: 'success' | 'error'
   message: string
@@ -34,24 +36,32 @@ export const Dashboard: React.FC = () => {
 
   const fetchVehicles = useCallback(async (term?: string) => {
     const { data } = await apiClient.get<Vehicle[]>('/vehicles', { params: term ? { search: term } : {} })
-    setVehicles(data)
+    const normalizedVehicles = data.map((item) => ({
+      ...item,
+      license_plate: normalizeLicensePlate(item.license_plate)
+    }))
+    setVehicles(normalizedVehicles)
     setSelectedVehicle((previous) => {
       if (previous) {
-        const found = data.find((item) => item.id === previous.id)
+        const found = normalizedVehicles.find((item) => item.id === previous.id)
         if (found) {
           return found
         }
       }
-      return data[0] ?? null
+      return normalizedVehicles[0] ?? null
     })
   }, [])
 
   const fetchVehicleDetail = useCallback(
     async (vehicleId: number) => {
       const { data } = await apiClient.get<VehicleDetail>(`/vehicles/${vehicleId}`)
-      setDetail(data)
-      setPositions(data.wheel_positions)
-      setSelectedPositionIndex(data.wheel_positions[0]?.position_index)
+      const normalizedDetail: VehicleDetail = {
+        ...data,
+        license_plate: normalizeLicensePlate(data.license_plate)
+      }
+      setDetail(normalizedDetail)
+      setPositions(normalizedDetail.wheel_positions)
+      setSelectedPositionIndex(normalizedDetail.wheel_positions[0]?.position_index)
     },
     []
   )
@@ -77,7 +87,7 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     if (detail) {
       setVehicleForm({
-        license_plate: detail.license_plate,
+        license_plate: normalizeLicensePlate(detail.license_plate),
         description: detail.description ?? ''
       })
     } else {
@@ -112,12 +122,17 @@ export const Dashboard: React.FC = () => {
   }
 
   const handleCreateVehicle = async (plate: string, description?: string) => {
+    const normalizedPlate = normalizeLicensePlate(plate)
     const { data } = await apiClient.post<VehicleDetail>('/vehicles', {
-      license_plate: plate,
+      license_plate: normalizedPlate,
       description
     })
     await fetchVehicles(search)
-    setSelectedVehicle({ id: data.id, license_plate: data.license_plate, description: data.description })
+    setSelectedVehicle({
+      id: data.id,
+      license_plate: normalizeLicensePlate(data.license_plate),
+      description: data.description
+    })
     setFeedback({ type: 'success', message: t('notifications.vehicleCreated') })
   }
 
@@ -132,6 +147,10 @@ export const Dashboard: React.FC = () => {
   }
 
   const handleVehicleFieldChange = (field: 'license_plate' | 'description', value: string) => {
+    if (field === 'license_plate') {
+      setVehicleForm((prev) => ({ ...prev, license_plate: normalizeLicensePlate(value) }))
+      return
+    }
     setVehicleForm((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -141,12 +160,21 @@ export const Dashboard: React.FC = () => {
     setVehicleSubmitting(true)
     try {
       const payload = {
-        license_plate: vehicleForm.license_plate.trim().toUpperCase(),
+        license_plate: normalizeLicensePlate(vehicleForm.license_plate),
         description: vehicleForm.description.trim() || null
       }
       const { data } = await apiClient.put<VehicleDetail>(`/vehicles/${detail.id}`, payload)
+      const normalizedDetail: VehicleDetail = {
+        ...data,
+        license_plate: normalizeLicensePlate(data.license_plate)
+      }
       await fetchVehicles(search)
-      setSelectedVehicle({ id: data.id, license_plate: data.license_plate, description: data.description })
+      setSelectedVehicle({
+        id: normalizedDetail.id,
+        license_plate: normalizedDetail.license_plate,
+        description: normalizedDetail.description
+      })
+      setDetail(normalizedDetail)
       setFeedback({ type: 'success', message: t('notifications.vehicleUpdated') })
       setEditingVehicle(false)
     } catch (error) {
@@ -195,8 +223,12 @@ export const Dashboard: React.FC = () => {
         `/vehicles/${detail.id}/wheel-positions/bulk`,
         payload
       )
-      setDetail(data)
-      setPositions(data.wheel_positions)
+      const normalizedDetail: VehicleDetail = {
+        ...data,
+        license_plate: normalizeLicensePlate(data.license_plate)
+      }
+      setDetail(normalizedDetail)
+      setPositions(normalizedDetail.wheel_positions)
       setFeedback({ type: 'success', message: t('notifications.saved') })
       setLastUpdatedMap((prev) => ({ ...prev, [detail.id]: new Date().toLocaleString() }))
     } catch (error) {
