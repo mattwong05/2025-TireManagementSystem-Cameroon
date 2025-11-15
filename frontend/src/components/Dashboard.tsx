@@ -393,7 +393,6 @@ export const Dashboard: React.FC = () => {
                 <WheelLayout
                   positions={positions}
                   selectedId={selectedPositionIndex}
-                  vehiclePlate={detail?.license_plate}
                   onSelect={(position) => setSelectedPositionIndex(position.position_index)}
                 />
               </div>
