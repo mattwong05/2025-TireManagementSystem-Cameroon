@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "轮胎管理"
+  },
+  "login": {
+    "title": "登录",
+    "username": "用户名",
+    "password": "密码",
+    "button": "登录",
+    "loading": "登录中…",
+    "error": "登录失败，请检查账号或密码"
+  },
+  "dashboard": {
+    "greeting": "您好，{{name}}",
+    "logout": "退出登录",
+    "save": "保存全部变更",
+    "saving": "保存中…",
+    "lastUpdated": "最近更新 {{time}}"
+  },
+  "vehicles": {
+    "title": "车队",
+    "search": "按车牌搜索",
+    "empty": "暂无车辆",
+    "add": "新增车辆",
+    "plateFormat": "格式 AB 123 CD",
+    "description": "车辆描述"
+  },
+  "wheels": {
+    "title": "轮位布局",
+    "position": "轮位 {{index}}",
+    "spare": "备胎 {{index}}",
+    "tireSerial": "轮胎编号",
+    "install": "安装",
+    "remove": "卸下",
+    "placeholder": "扫描或输入编号",
+    "statusEmpty": "空位",
+    "statusInstalled": "已安装",
+    "mobileToggle": "车辆列表",
+    "selectPrompt": "请选择轮位进行编辑"
+  },
+  "theme": {
+    "label": "主题",
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "深色"
+  },
+  "language": {
+    "label": "语言"
+  },
+  "notifications": {
+    "saved": "轮位信息已保存",
+    "error": "操作失败，请重试",
+    "vehicleCreated": "车辆已新增"
+  }
+}

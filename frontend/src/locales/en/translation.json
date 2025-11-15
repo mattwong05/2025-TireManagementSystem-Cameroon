@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "Tire Management"
+  },
+  "login": {
+    "title": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "button": "Sign in",
+    "loading": "Signing in...",
+    "error": "Login failed. Please check your credentials."
+  },
+  "dashboard": {
+    "greeting": "Hello, {{name}}",
+    "logout": "Log out",
+    "save": "Save all changes",
+    "saving": "Saving...",
+    "lastUpdated": "Last updated {{time}}"
+  },
+  "vehicles": {
+    "title": "Fleet",
+    "search": "Search by plate",
+    "empty": "No vehicles yet",
+    "add": "Add vehicle",
+    "plateFormat": "Format AB 123 CD",
+    "description": "Description"
+  },
+  "wheels": {
+    "title": "Wheel layout",
+    "position": "Position {{index}}",
+    "spare": "Spare {{index}}",
+    "tireSerial": "Tire serial",
+    "install": "Install",
+    "remove": "Remove",
+    "placeholder": "Scan or type serial",
+    "statusEmpty": "Empty",
+    "statusInstalled": "Installed",
+    "mobileToggle": "Toggle vehicle list",
+    "selectPrompt": "Select a wheel position to edit"
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "notifications": {
+    "saved": "Wheel positions saved",
+    "error": "Something went wrong",
+    "vehicleCreated": "Vehicle added"
+  }
+}

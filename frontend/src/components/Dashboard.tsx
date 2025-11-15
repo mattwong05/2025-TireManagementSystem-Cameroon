@@ -1,0 +1,237 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { apiClient } from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
+import { Vehicle, VehicleDetail, WheelPosition } from '../types'
+import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeToggle } from './ThemeToggle'
+import { VehicleList } from './VehicleList'
+import { WheelLayout } from './WheelLayout'
+import { WheelDetailPanel } from './WheelDetailPanel'
+
+interface FeedbackMessage {
+  type: 'success' | 'error'
+  message: string
+}
+
+export const Dashboard: React.FC = () => {
+  const { user, logout } = useAuth()
+  const { t } = useTranslation()
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [search, setSearch] = useState('')
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
+  const [detail, setDetail] = useState<VehicleDetail | null>(null)
+  const [positions, setPositions] = useState<WheelPosition[]>([])
+  const [selectedPositionIndex, setSelectedPositionIndex] = useState<number | undefined>(undefined)
+  const [saving, setSaving] = useState(false)
+  const [feedback, setFeedback] = useState<FeedbackMessage | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<string>('')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
+
+  const fetchVehicles = useCallback(async (term?: string) => {
+    const { data } = await apiClient.get<Vehicle[]>('/vehicles', { params: term ? { search: term } : {} })
+    setVehicles(data)
+    if (!selectedVehicle && data.length > 0) {
+      setSelectedVehicle(data[0])
+    }
+  }, [selectedVehicle])
+
+  const fetchVehicleDetail = useCallback(
+    async (vehicleId: number) => {
+      const { data } = await apiClient.get<VehicleDetail>(`/vehicles/${vehicleId}`)
+      setDetail(data)
+      setPositions(data.wheel_positions)
+      setSelectedPositionIndex(data.wheel_positions[0]?.position_index)
+    },
+    []
+  )
+
+  useEffect(() => {
+    fetchVehicles().catch(() => setFeedback({ type: 'error', message: t('notifications.error') }))
+  }, [fetchVehicles, t])
+
+  useEffect(() => {
+    if (selectedVehicle) {
+      fetchVehicleDetail(selectedVehicle.id).catch(() => setFeedback({ type: 'error', message: t('notifications.error') }))
+    }
+  }, [selectedVehicle, fetchVehicleDetail, t])
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      fetchVehicles(search).catch(() => setFeedback({ type: 'error', message: t('notifications.error') }))
+    }, 350)
+    return () => clearTimeout(handle)
+  }, [search, fetchVehicles, t])
+
+  useEffect(() => {
+    if (feedback) {
+      const timer = setTimeout(() => setFeedback(null), 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [feedback])
+
+  const selectedPosition = useMemo(
+    () => positions.find((position) => position.position_index === selectedPositionIndex),
+    [positions, selectedPositionIndex]
+  )
+
+  const handleSelectVehicle = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle)
+    setSidebarCollapsed(true)
+  }
+
+  const handleCreateVehicle = async (plate: string, description?: string) => {
+    const { data } = await apiClient.post<VehicleDetail>('/vehicles', {
+      license_plate: plate,
+      description
+    })
+    await fetchVehicles(search)
+    setSelectedVehicle({ id: data.id, license_plate: data.license_plate, description: data.description })
+    setFeedback({ type: 'success', message: t('notifications.vehicleCreated') })
+  }
+
+  const handlePositionUpdate = (positionIndex: number, serial: string) => {
+    setPositions((prev) =>
+      prev.map((item) =>
+        item.position_index === positionIndex
+          ? { ...item, tire_serial: serial ? serial.toUpperCase() : null }
+          : item
+      )
+    )
+  }
+
+  const handleRemove = (positionIndex: number) => {
+    setPositions((prev) =>
+      prev.map((item) =>
+        item.position_index === positionIndex ? { ...item, tire_serial: null } : item
+      )
+    )
+  }
+
+  const handleSave = async () => {
+    if (!detail) return
+    setSaving(true)
+    try {
+      const payload = {
+        positions: positions.map((item) => ({
+          position_index: item.position_index,
+          tire_serial: item.tire_serial || null
+        }))
+      }
+      const { data } = await apiClient.post<VehicleDetail>(
+        `/vehicles/${detail.id}/wheel-positions/bulk`,
+        payload
+      )
+      setDetail(data)
+      setPositions(data.wheel_positions)
+      setFeedback({ type: 'success', message: t('notifications.saved') })
+      setLastUpdated(new Date().toLocaleString())
+    } catch (error) {
+      setFeedback({ type: 'error', message: t('notifications.error') })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900">
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur">
+        <div className="mx-auto max-w-7xl px-4 py-3 flex flex-wrap items-center gap-3 justify-between">
+          <div className="flex flex-col">
+            <span className="text-sm text-slate-500 dark:text-slate-400">{t('dashboard.greeting', { name: user?.username })}</span>
+            <h1 className="text-xl font-semibold">{t('app.title')}</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={logout}
+              className="rounded-md border border-slate-300 dark:border-slate-700 px-3 py-1 text-sm"
+            >
+              {t('dashboard.logout')}
+            </button>
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-7xl px-4 py-6">
+        {feedback && (
+          <div
+            className={`mb-4 rounded-md px-4 py-2 text-sm ${
+              feedback.type === 'success'
+                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300'
+                : 'bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-300'
+            }`}
+          >
+            {feedback.message}
+          </div>
+        )}
+        <div className="mb-4 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed(false)}
+            className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold"
+          >
+            {t('wheels.mobileToggle')}
+          </button>
+        </div>
+        <div className="grid lg:grid-cols-[280px,1fr] gap-6">
+          <VehicleList
+            vehicles={vehicles}
+            selectedId={selectedVehicle?.id}
+            search={search}
+            onSearchChange={setSearch}
+            onSelect={handleSelectVehicle}
+            onCreate={handleCreateVehicle}
+            collapsed={sidebarCollapsed}
+            onToggleCollapsed={() => setSidebarCollapsed((value) => !value)}
+          />
+          <div className="space-y-6">
+            {detail && (
+              <div className="rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold">{detail.license_plate}</h2>
+                  {detail.description && (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{detail.description}</p>
+                  )}
+                  {lastUpdated && (
+                    <p className="text-xs text-slate-400">{t('dashboard.lastUpdated', { time: lastUpdated })}</p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="rounded-md bg-amber-500 text-white px-4 py-2 font-semibold hover:bg-amber-600 disabled:opacity-60"
+                >
+                  {saving ? t('dashboard.saving') : t('dashboard.save')}
+                </button>
+              </div>
+            )}
+            <div className="grid lg:grid-cols-[minmax(0,2fr),minmax(0,1fr)] gap-6">
+              <div className="rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm">
+                <WheelLayout
+                  positions={positions}
+                  selectedId={selectedPositionIndex}
+                  onSelect={(position) => setSelectedPositionIndex(position.position_index)}
+                />
+              </div>
+              <WheelDetailPanel
+                position={selectedPosition}
+                onUpdate={(serial) => {
+                  if (!selectedPosition) return
+                  handlePositionUpdate(selectedPosition.position_index, serial)
+                }}
+                onRemove={() => {
+                  if (!selectedPosition) return
+                  handleRemove(selectedPosition.position_index)
+                }}
+                disabled={!detail}
+              />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
