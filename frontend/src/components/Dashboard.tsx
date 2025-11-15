@@ -259,7 +259,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6">
+      <main className="mx-auto max-w-7xl px-4 py-4 sm:py-6">
         {feedback && (
           <div
             className={`mb-4 rounded-md px-4 py-2 text-sm ${
@@ -280,7 +280,7 @@ export const Dashboard: React.FC = () => {
             {t('wheels.mobileToggle')}
           </button>
         </div>
-        <div className="grid lg:grid-cols-[280px,1fr] gap-6">
+        <div className="grid gap-3 sm:gap-4 lg:grid-cols-[280px,1fr] lg:gap-6">
           <VehicleList
             vehicles={vehicles}
             selectedId={selectedVehicle?.id}
@@ -291,9 +291,9 @@ export const Dashboard: React.FC = () => {
             collapsed={sidebarCollapsed}
             onToggleCollapsed={() => setSidebarCollapsed((value) => !value)}
           />
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-5">
             {detail && (
-              <div className="rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm space-y-4">
+              <div className="rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm space-y-3 sm:space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-lg font-semibold">{detail.license_plate}</h2>
