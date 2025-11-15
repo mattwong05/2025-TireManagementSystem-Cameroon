@@ -97,7 +97,132 @@ npm run build  # 生成生产静态资源
   ```
 -  默认前端通过 `VITE_API_BASE_URL` 环境变量（默认 `http://localhost:8000`）调用后端，可复制 `frontend/.env.example` 为 `.env` 后按需自定义。
 
-### 4. 运行测试
+### 4. systemd + Nginx 生产部署指引
+
+下列方案基于 **Ubuntu 22.04**，假设仓库位于 `/opt/tire-system`。
+
+#### 4.1 创建运行用户与目录
+
+```bash
+sudo useradd --system --create-home --shell /usr/sbin/nologin tiresvc
+sudo mkdir -p /opt/tire-system
+sudo chown tiresvc:tiresvc /opt/tire-system
+
+# 将代码同步到 /opt/tire-system，例如使用 rsync / scp / git clone
+sudo -u tiresvc git clone https://example.com/2025-TireManagementSystem-Cameroon.git /opt/tire-system
+```
+
+#### 4.2 后端虚拟环境与配置
+
+```bash
+sudo -u tiresvc python3 -m venv /opt/tire-system/backend/.venv
+sudo -u tiresvc /opt/tire-system/backend/.venv/bin/pip install --upgrade pip
+sudo -u tiresvc /opt/tire-system/backend/.venv/bin/pip install -r /opt/tire-system/backend/requirements.txt
+
+# 根据需要写入环境变量
+sudo tee /etc/2025-tire-backend.env >/dev/null <<'EOF'
+SECRET_KEY=请替换为随机字符串
+DATABASE_URL=sqlite:////opt/tire-system/backend/data.sqlite3
+DEFAULT_ADMIN_USERNAME=admin
+DEFAULT_ADMIN_PASSWORD=更安全的密码
+VITE_ALLOWED_ORIGINS=https://tire.example.com
+EOF
+
+sudo chown tiresvc:tiresvc /etc/2025-tire-backend.env
+sudo chmod 640 /etc/2025-tire-backend.env
+
+# 初始化数据库
+sudo -u tiresvc env $(cat /etc/2025-tire-backend.env | xargs) \
+  /opt/tire-system/backend/.venv/bin/python -m app.init_db
+```
+
+#### 4.3 systemd 服务模板
+
+创建 `/etc/systemd/system/tire-backend.service`：
+
+```ini
+[Unit]
+Description=Tire Management System FastAPI backend
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tiresvc
+Group=tiresvc
+WorkingDirectory=/opt/tire-system/backend
+EnvironmentFile=/etc/2025-tire-backend.env
+ExecStart=/opt/tire-system/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+```
+
+启用并启动服务：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now tire-backend.service
+sudo systemctl status tire-backend.service
+```
+
+日志查看：`journalctl -u tire-backend.service -f`
+
+#### 4.4 前端构建与 Nginx 部署
+
+```bash
+sudo -u tiresvc npm --prefix /opt/tire-system/frontend install
+sudo -u tiresvc npm --prefix /opt/tire-system/frontend run build
+
+# dist 目录将生成在 /opt/tire-system/frontend/dist
+```
+
+创建 `/etc/nginx/sites-available/tire-frontend.conf`：
+
+```nginx
+server {
+    listen 80;
+    server_name tire.example.com;
+
+    root /opt/tire-system/frontend/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+启用站点并重启 Nginx：
+
+```bash
+sudo ln -s /etc/nginx/sites-available/tire-frontend.conf /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+如需 HTTPS，可使用 [Certbot](https://certbot.eff.org/) 为该站点签发证书。
+
+#### 4.5 常见维护命令
+
+- 更新后端依赖：`sudo -u tiresvc /opt/tire-system/backend/.venv/bin/pip install -r /opt/tire-system/backend/requirements.txt`
+- 重新加载服务：`sudo systemctl restart tire-backend.service`
+- 查看前端构建版本：`ls -lt /opt/tire-system/frontend/dist`
+- Nginx 日志：`/var/log/nginx/access.log`、`/var/log/nginx/error.log`
+
+### 5. 运行测试
 
 ```bash
 cd backend
