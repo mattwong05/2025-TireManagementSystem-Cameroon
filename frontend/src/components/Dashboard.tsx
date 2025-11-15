@@ -8,8 +8,7 @@ import { ThemeToggle } from './ThemeToggle'
 import { VehicleList } from './VehicleList'
 import { WheelLayout } from './WheelLayout'
 import { WheelDetailPanel } from './WheelDetailPanel'
-
-const normalizeLicensePlate = (value: string): string => value.replace(/\s+/g, '').toUpperCase()
+import { normalizeLicensePlate } from '../utils/licensePlate'
 
 interface FeedbackMessage {
   type: 'success' | 'error'
@@ -376,6 +375,7 @@ export const Dashboard: React.FC = () => {
                 <WheelLayout
                   positions={positions}
                   selectedId={selectedPositionIndex}
+                  vehiclePlate={detail?.license_plate}
                   onSelect={(position) => setSelectedPositionIndex(position.position_index)}
                 />
               </div>
