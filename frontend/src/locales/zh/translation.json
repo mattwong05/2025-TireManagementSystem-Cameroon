@@ -22,6 +22,14 @@
     "search": "按车牌搜索",
     "empty": "暂无车辆",
     "add": "新增车辆",
+    "edit": "编辑",
+    "cancelEdit": "取消",
+    "update": "保存车辆信息",
+    "updating": "保存中…",
+    "delete": "删除",
+    "deleting": "删除中…",
+    "plateLabel": "车牌号码",
+    "deleteConfirm": "确定删除车辆 {{plate}}？该操作无法恢复。",
     "plateFormat": "格式 AB 123 CD",
     "description": "车辆描述"
   },
@@ -50,6 +58,8 @@
   "notifications": {
     "saved": "轮位信息已保存",
     "error": "操作失败，请重试",
-    "vehicleCreated": "车辆已新增"
+    "vehicleCreated": "车辆已新增",
+    "vehicleUpdated": "车辆信息已更新",
+    "vehicleDeleted": "车辆已删除"
   }
 }

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -106,8 +106,34 @@ def update_vehicle(
     vehicle = crud.get_vehicle(db, vehicle_id)
     if not vehicle:
         raise HTTPException(status_code=404, detail="Vehicle not found")
-    vehicle = crud.update_vehicle(db, vehicle, vehicle_in)
+    update_data = vehicle_in.model_dump(exclude_unset=True)
+    license_plate = update_data.get("license_plate")
+    if license_plate:
+        normalized_plate = license_plate.upper()
+        existing = crud.get_vehicle_by_plate(db, normalized_plate)
+        if existing and existing.id != vehicle.id:
+            raise HTTPException(status_code=400, detail="Vehicle already exists")
+        update_data["license_plate"] = normalized_plate
+    vehicle = crud.update_vehicle(db, vehicle, schemas.VehicleUpdate(**update_data))
     return schemas.VehicleWithPositions.model_validate(vehicle)
+
+
+@app.delete(
+    "/vehicles/{vehicle_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Vehicles"],
+    response_class=Response,
+)
+def delete_vehicle(
+    vehicle_id: int,
+    db: Session = Depends(get_db),
+    _: schemas.UserRead = Depends(get_current_user),
+) -> Response:
+    vehicle = crud.get_vehicle(db, vehicle_id)
+    if not vehicle:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+    crud.delete_vehicle(db, vehicle)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @app.get(

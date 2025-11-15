@@ -17,7 +17,7 @@ body {
 .plate-card {
   width: 100%;
   aspect-ratio: 520 / 110;
-  @apply bg-plate text-plate-text rounded-md shadow-sm border border-slate-500 flex items-center justify-center font-semibold tracking-widest text-lg;
+  @apply bg-plate text-plate-text rounded-md shadow-sm border border-slate-500 flex items-center justify-center font-semibold tracking-[0.35em] text-base sm:text-lg px-4 text-center;
 }
 
 .plate-card.active {

@@ -24,11 +24,11 @@ export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId,
 
   const renderCell = (index: number | null) => {
     if (!index) {
-      return <div className="h-16 w-16" aria-hidden="true" />
+      return <div className="h-24 w-20 sm:w-24" aria-hidden="true" />
     }
     const position = map.get(index)
     if (!position) {
-      return <div className="h-16 w-16" aria-hidden="true" />
+      return <div className="h-24 w-20 sm:w-24" aria-hidden="true" />
     }
     return (
       <WheelPositionCard
@@ -43,30 +43,32 @@ export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId,
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">{t('wheels.title')}</h2>
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-4">
-        <div className="flex flex-col gap-4">
-          {axleLayout.map((row, index) => (
-            <div key={`left-${index}`} className="flex justify-end gap-3">
-              {row.left.map((item, idx) => (
-                <React.Fragment key={`left-${index}-${idx}`}>{renderCell(item)}</React.Fragment>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="flex items-stretch">
-          <div className="w-6 rounded-full bg-amber-300/80 dark:bg-amber-500/40 mx-auto" />
-        </div>
-        <div className="flex flex-col gap-4">
-          {axleLayout.map((row, index) => (
-            <div key={`right-${index}`} className="flex justify-start gap-3">
-              {row.right.map((item, idx) => (
-                <React.Fragment key={`right-${index}-${idx}`}>{renderCell(item)}</React.Fragment>
-              ))}
-            </div>
-          ))}
+      <div className="overflow-x-auto pb-2">
+        <div className="inline-grid grid-cols-[1fr_auto_1fr] gap-4 min-w-[320px] sm:min-w-[420px]">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            {axleLayout.map((row, index) => (
+              <div key={`left-${index}`} className="flex justify-end gap-2 sm:gap-3">
+                {row.left.map((item, idx) => (
+                  <React.Fragment key={`left-${index}-${idx}`}>{renderCell(item)}</React.Fragment>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 sm:w-6 h-full rounded-full bg-amber-300/80 dark:bg-amber-500/40 mx-auto" />
+          </div>
+          <div className="flex flex-col gap-3 sm:gap-4">
+            {axleLayout.map((row, index) => (
+              <div key={`right-${index}`} className="flex justify-start gap-2 sm:gap-3">
+                {row.right.map((item, idx) => (
+                  <React.Fragment key={`right-${index}-${idx}`}>{renderCell(item)}</React.Fragment>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
         {sparePositions.map((position) => (
           <WheelPositionCard
             key={position.id}

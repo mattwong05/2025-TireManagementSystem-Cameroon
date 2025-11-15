@@ -66,6 +66,11 @@ def update_vehicle(db: Session, vehicle: models.Vehicle, vehicle_in: schemas.Veh
     return vehicle
 
 
+def delete_vehicle(db: Session, vehicle: models.Vehicle) -> None:
+    db.delete(vehicle)
+    db.commit()
+
+
 def _ensure_wheel_positions(db: Session, vehicle: models.Vehicle) -> None:
     existing = {wp.position_index for wp in vehicle.wheel_positions}
     for idx in range(1, schemas.WHEEL_POSITIONS + 1):

@@ -40,6 +40,7 @@ class VehicleCreate(VehicleBase):
 
 
 class VehicleUpdate(BaseModel):
+    license_plate: Optional[constr(strip_whitespace=True, min_length=5, max_length=32)] = None
     description: Optional[str] = Field(default=None, max_length=255)
 
 

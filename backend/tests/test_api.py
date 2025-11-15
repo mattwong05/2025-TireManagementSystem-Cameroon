@@ -41,6 +41,14 @@ def test_vehicle_lifecycle(client: TestClient) -> None:
     assert update_response.status_code == 200
     assert update_response.json()["tire_serial"] == "TIRE001"
 
+    vehicle_update = client.put(
+        f"/vehicles/{vehicle_id}",
+        json={"license_plate": "LT 999 CM", "description": "Updated"},
+        headers=headers,
+    )
+    assert vehicle_update.status_code == 200
+    assert vehicle_update.json()["license_plate"] == "LT 999 CM"
+
     remove_response = client.delete(
         f"/vehicles/{vehicle_id}/wheel-positions/1",
         headers=headers,
@@ -67,6 +75,13 @@ def test_vehicle_lifecycle(client: TestClient) -> None:
     assert detail_response.status_code == 200
     detail_body = detail_response.json()
     assert len(detail_body["wheel_positions"]) == 20
+
+    delete_response = client.delete(f"/vehicles/{vehicle_id}", headers=headers)
+    assert delete_response.status_code == 204
+
+    list_after_delete = client.get("/vehicles", headers=headers)
+    assert list_after_delete.status_code == 200
+    assert all(item["id"] != vehicle_id for item in list_after_delete.json())
 
 
 def test_search(client: TestClient) -> None:

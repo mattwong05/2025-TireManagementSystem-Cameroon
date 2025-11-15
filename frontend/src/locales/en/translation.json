@@ -22,6 +22,14 @@
     "search": "Search by plate",
     "empty": "No vehicles yet",
     "add": "Add vehicle",
+    "edit": "Edit",
+    "cancelEdit": "Cancel",
+    "update": "Save vehicle",
+    "updating": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "plateLabel": "License plate",
+    "deleteConfirm": "Delete vehicle {{plate}}? This cannot be undone.",
     "plateFormat": "Format AB 123 CD",
     "description": "Description"
   },
@@ -50,6 +58,8 @@
   "notifications": {
     "saved": "Wheel positions saved",
     "error": "Something went wrong",
-    "vehicleCreated": "Vehicle added"
+    "vehicleCreated": "Vehicle added",
+    "vehicleUpdated": "Vehicle updated",
+    "vehicleDeleted": "Vehicle deleted"
   }
 }
