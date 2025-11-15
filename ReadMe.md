@@ -95,7 +95,7 @@ npm run build  # 生成生产静态资源
   ```bash
   npm run dev -- --host 0.0.0.0 --port 5173
   ```
-  默认前端通过 `VITE_API_BASE_URL` 环境变量（默认 `http://localhost:8000`）调用后端，可在 `.env` 中自定义。
+-  默认前端通过 `VITE_API_BASE_URL` 环境变量（默认 `http://localhost:8000`）调用后端，可复制 `frontend/.env.example` 为 `.env` 后按需自定义。
 
 ### 4. 运行测试
 
