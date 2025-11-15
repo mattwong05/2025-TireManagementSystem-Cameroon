@@ -14,6 +14,7 @@ export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, 
   const label = isSpare ? t('wheels.spare', { index: position.position_index - 18 }) : t('wheels.position', { index: position.position_index })
   const status = position.tire_serial ? t('wheels.statusInstalled') : t('wheels.statusEmpty')
   const serialRef = useRef<HTMLSpanElement>(null)
+  const appliedFontSizeRef = useRef<number | null>(null)
 
   useLayoutEffect(() => {
     const element = serialRef.current
@@ -21,29 +22,87 @@ export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, 
       return
     }
 
+    appliedFontSizeRef.current = null
+
     const fontSizes = [13, 12, 11, 10, 9]
     const maxLines = 2
+    const lineHeightValue = '1.15'
+
+    const ensureBaseStyles = () => {
+      if (!element) {
+        return
+      }
+      if (element.style.lineHeight !== lineHeightValue) {
+        element.style.lineHeight = lineHeightValue
+      }
+    }
+
+    const applyFontSize = (size: number) => {
+      if (!element) {
+        return
+      }
+      ensureBaseStyles()
+      if (appliedFontSizeRef.current === size) {
+        return
+      }
+      element.style.fontSize = `${size}px`
+      appliedFontSizeRef.current = size
+    }
+
+    const measureFits = () => {
+      if (!element) {
+        return true
+      }
+      const computed = window.getComputedStyle(element)
+      const lineHeight = parseFloat(computed.lineHeight)
+      if (!lineHeight) {
+        return true
+      }
+      const maxHeight = lineHeight * maxLines
+      return element.scrollHeight <= maxHeight + 0.5
+    }
+
+    const resolveCurrentIndex = () => {
+      const target = appliedFontSizeRef.current
+      if (target) {
+        const index = fontSizes.indexOf(target)
+        if (index !== -1) {
+          return index
+        }
+      }
+
+      const computed = parseFloat(window.getComputedStyle(element).fontSize)
+      const nearestIndex = fontSizes.findIndex((size) => Math.abs(size - computed) < 0.51)
+      if (nearestIndex !== -1) {
+        return nearestIndex
+      }
+
+      const fallbackIndex = fontSizes.findIndex((size) => size <= computed)
+      return fallbackIndex === -1 ? 0 : fallbackIndex
+    }
 
     const adjustFontSize = () => {
       if (!element) {
         return
       }
 
-      for (const size of fontSizes) {
-        element.style.fontSize = `${size}px`
-        element.style.lineHeight = '1.15'
+      let index = resolveCurrentIndex()
+      applyFontSize(fontSizes[index])
 
-        const computed = window.getComputedStyle(element)
-        const lineHeight = parseFloat(computed.lineHeight)
-        if (!lineHeight) {
+      while (index > 0) {
+        applyFontSize(fontSizes[index - 1])
+        if (measureFits()) {
+          index -= 1
           continue
         }
-        const lineCount = Math.round(element.scrollHeight / lineHeight)
-        if (lineCount <= maxLines) {
-          return
-        }
+        applyFontSize(fontSizes[index])
+        break
       }
-      element.style.fontSize = `${fontSizes[fontSizes.length - 1]}px`
+
+      while (!measureFits() && index < fontSizes.length - 1) {
+        applyFontSize(fontSizes[index + 1])
+        index += 1
+      }
     }
 
     adjustFontSize()
