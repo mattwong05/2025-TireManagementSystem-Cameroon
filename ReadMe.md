@@ -132,8 +132,11 @@ sudo chown tiresvc:tiresvc /etc/2025-tire-backend.env
 sudo chmod 640 /etc/2025-tire-backend.env
 
 # 初始化数据库
-sudo -u tiresvc env $(cat /etc/2025-tire-backend.env | xargs) \
-  /opt/tire-system/backend/.venv/bin/python -m app.init_db
+sudo -u tiresvc bash -lc '
+  export $(cat /etc/2025-tire-backend.env | xargs)
+  cd /opt/tire-system/backend
+  .venv/bin/python -m app.init_db
+'
 ```
 
 #### 4.3 systemd 服务模板
@@ -152,7 +155,7 @@ User=tiresvc
 Group=tiresvc
 WorkingDirectory=/opt/tire-system/backend
 EnvironmentFile=/etc/2025-tire-backend.env
-ExecStart=/opt/tire-system/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers
+ExecStart=/opt/tire-system/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers --root-path /api
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
