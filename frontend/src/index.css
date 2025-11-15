@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply font-sans antialiased text-slate-900 bg-slate-100 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-200;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.plate-card {
+  width: 100%;
+  aspect-ratio: 520 / 110;
+  @apply bg-plate text-plate-text rounded-md shadow-sm border border-slate-500 flex items-center justify-around font-semibold text-base sm:text-lg px-4 text-center;
+}
+
+.plate-card.active {
+  @apply border-2 border-amber-500 shadow-[0_0_0_1px_rgba(245,158,11,0.25)];
+}
+
+.plate-segment {
+  @apply uppercase tracking-[0.2em] leading-tight;
+}
+
+.wheel-cell {
+  @apply border border-slate-300 dark:border-slate-700 rounded-md p-2 flex flex-col items-center justify-center gap-1 text-center bg-white dark:bg-slate-800 transition-colors duration-200;
+}
+
+.wheel-cell.selected {
+  @apply border-2 border-amber-500 shadow-[0_0_0_1px_rgba(245,158,11,0.2)];
+}
+
+.wheel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .wheel-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
