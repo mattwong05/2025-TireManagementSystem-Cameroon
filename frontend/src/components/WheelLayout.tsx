@@ -46,8 +46,8 @@ export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId,
       <div className="space-y-1">
         <div className="overflow-x-auto pb-2">
           <div className="mx-auto min-w-fit px-2">
-            <div className="flex items-stretch justify-center gap-4 sm:gap-6">
-              <div className="flex flex-col items-end gap-1 sm:gap-3.5">
+            <div className="flex items-stretch justify-center gap-2.5 sm:gap-6">
+              <div className="flex flex-col items-end gap-1.5 sm:gap-3.5">
                 {axleLayout.map((row, index) => (
                   <div key={`left-${index}`} className="flex justify-end gap-1.5 sm:gap-3.5">
                     {row.left.map((item, idx) => (
@@ -59,7 +59,7 @@ export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId,
               <div className="flex items-center">
                 <div className="mx-1 sm:mx-1.5 h-full w-1 sm:w-1.5 rounded-full bg-amber-300/80 dark:bg-amber-500/40" />
               </div>
-              <div className="flex flex-col items-start gap-1 sm:gap-3.5">
+              <div className="flex flex-col items-start gap-1.5 sm:gap-3.5">
                 {axleLayout.map((row, index) => (
                   <div key={`right-${index}`} className="flex justify-start gap-1.5 sm:gap-3.5">
                     {row.right.map((item, idx) => (
