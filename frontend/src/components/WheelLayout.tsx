@@ -24,11 +24,11 @@ export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId,
 
   const renderCell = (index: number | null) => {
     if (!index) {
-      return <div className="h-24 w-20 sm:w-24" aria-hidden="true" />
+      return <div className="h-24 w-24 sm:w-28" aria-hidden="true" />
     }
     const position = map.get(index)
     if (!position) {
-      return <div className="h-24 w-20 sm:w-24" aria-hidden="true" />
+      return <div className="h-24 w-24 sm:w-28" aria-hidden="true" />
     }
     return (
       <WheelPositionCard

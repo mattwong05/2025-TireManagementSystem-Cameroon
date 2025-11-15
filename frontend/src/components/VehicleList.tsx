@@ -2,6 +2,54 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Vehicle } from '../types'
 
+const padToThree = (parts: Array<string | undefined>): string[] => {
+  const result = parts.map((segment) => segment?.trim() ?? '')
+  while (result.length < 3) {
+    result.push('')
+  }
+  return result.slice(0, 3)
+}
+
+const getPlateSegments = (plate: string): string[] => {
+  const normalized = plate.trim().toUpperCase()
+  if (!normalized) {
+    return padToThree(['', '', ''])
+  }
+
+  const directParts = normalized.split(/\s+/).filter(Boolean)
+  if (directParts.length >= 3) {
+    return padToThree(directParts)
+  }
+
+  if (directParts.length === 2) {
+    const [first, second] = directParts
+    if (second.length <= 3) {
+      return padToThree([first, second])
+    }
+    return padToThree([first, second.slice(0, 3), second.slice(3)])
+  }
+
+  const compact = normalized.replace(/\s+/g, '')
+  if (compact.length <= 3) {
+    return padToThree([compact])
+  }
+
+  const region = compact.slice(0, 2)
+  const rest = compact.slice(2)
+  const digitsMatch = rest.match(/^(\d{1,4})(.*)$/)
+  if (digitsMatch) {
+    const [, digits, suffix] = digitsMatch
+    return padToThree([region, digits, suffix])
+  }
+
+  const baseSize = Math.ceil(compact.length / 3)
+  return padToThree([
+    compact.slice(0, baseSize),
+    compact.slice(baseSize, baseSize * 2),
+    compact.slice(baseSize * 2)
+  ])
+}
+
 interface VehicleListProps {
   vehicles: Vehicle[]
   selectedId?: number
@@ -81,12 +129,15 @@ export const VehicleList: React.FC<VehicleListProps> = ({
             </div>
             <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
               {vehicles.length === 0 && <p className="text-sm text-slate-500">{t('vehicles.empty')}</p>}
-              {vehicles.map((vehicle) => (
-                <button
-                  key={vehicle.id}
-                  type="button"
-                  onClick={() => {
-                    onSelect(vehicle)
+              {vehicles.map((vehicle) => {
+                const segments = getPlateSegments(vehicle.license_plate)
+
+                return (
+                  <button
+                    key={vehicle.id}
+                    type="button"
+                    onClick={() => {
+                      onSelect(vehicle)
                     if (window.innerWidth < 1024) {
                       onToggleCollapsed()
                     }
@@ -94,10 +145,14 @@ export const VehicleList: React.FC<VehicleListProps> = ({
                   className="w-full"
                 >
                   <div className={`plate-card ${vehicle.id === selectedId ? 'active' : ''}`}>
-                    {vehicle.license_plate}
+                    {segments.map((segment, index) => (
+                      <span key={`${vehicle.id}-${index}`} className="plate-segment">
+                        {segment || '\u00A0'}
+                      </span>
+                    ))}
                   </div>
                 </button>
-              ))}
+              )})}
             </div>
             <form onSubmit={handleCreate} className="space-y-3 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
               <div className="space-y-1">

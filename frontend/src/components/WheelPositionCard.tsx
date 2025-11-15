@@ -18,10 +18,10 @@ export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, 
     <button
       type="button"
       onClick={() => onSelect(position)}
-      className={`wheel-cell ${selected ? 'selected' : ''} h-24 w-20 sm:w-24`}
+      className={`wheel-cell ${selected ? 'selected' : ''} h-24 w-24 sm:w-28`}
     >
       <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">{label}</span>
-      <span className="text-xs font-semibold break-all text-slate-900 dark:text-slate-100 sm:text-sm sm:break-words">
+      <span className="text-[0.7rem] sm:text-sm font-semibold text-slate-900 dark:text-slate-100 text-center leading-tight break-words break-all px-1">
         {position.tire_serial || '--'}
       </span>
       <span className="text-xs text-slate-400">{status}</span>
