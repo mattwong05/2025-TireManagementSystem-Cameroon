@@ -17,7 +17,8 @@ body {
 .plate-card {
   width: 100%;
   aspect-ratio: 520 / 110;
-  @apply bg-plate text-plate-text rounded-md shadow-sm border border-slate-500 flex items-center justify-around font-semibold text-sm lg:text-lg px-3 lg:px-4 text-center;
+  @apply bg-plate text-plate-text rounded-md shadow-sm border border-slate-500 flex items-center justify-center font-semibold text-sm lg:text-lg px-3 lg:px-4 text-center;
+  gap: 0.4rem;
 }
 
 .plate-card.active {
@@ -25,15 +26,28 @@ body {
 }
 
 .plate-segment {
-  @apply uppercase tracking-[0.2em] leading-tight;
+  @apply uppercase leading-tight;
+  letter-spacing: 0.12em;
 }
 
 .mini-plate-card {
-  @apply bg-plate text-plate-text rounded-md border border-slate-500 shadow-sm flex items-center justify-around font-semibold px-2 py-1 text-[0.65rem] gap-1;
+  @apply bg-plate text-plate-text rounded-md border border-slate-500 shadow-sm flex items-center justify-center font-semibold px-2 py-1 text-[0.65rem];
+  gap: 0.3rem;
 }
 
 .mini-plate-segment {
-  @apply uppercase tracking-[0.18em] leading-tight;
+  @apply uppercase leading-tight;
+  letter-spacing: 0.16em;
+}
+
+.detail-plate-card {
+  @apply bg-plate text-plate-text rounded-md border border-slate-500 shadow-sm inline-flex items-center justify-center font-semibold px-3 py-1 text-sm sm:text-base lg:text-lg;
+  gap: 0.45rem;
+}
+
+.detail-plate-segment {
+  @apply uppercase leading-tight;
+  letter-spacing: 0.14em;
 }
 
 .wheel-cell {

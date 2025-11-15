@@ -65,7 +65,7 @@ export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId,
       <div className="space-y-1">
         <div className="overflow-x-auto pb-2">
           <div className="mx-auto min-w-fit px-2">
-            <div className="flex items-stretch justify-center gap-4 sm:gap-6">
+            <div className="flex items-stretch justify-center gap-2.5 sm:gap-6">
               <div className="flex flex-col items-end gap-1 sm:gap-3.5">
                 {axleLayout.map((row, index) => (
                   <div key={`left-${index}`} className="flex justify-end gap-1.5 sm:gap-3.5">

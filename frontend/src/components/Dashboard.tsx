@@ -8,7 +8,7 @@ import { ThemeToggle } from './ThemeToggle'
 import { VehicleList } from './VehicleList'
 import { WheelLayout } from './WheelLayout'
 import { WheelDetailPanel } from './WheelDetailPanel'
-import { normalizeLicensePlate } from '../utils/licensePlate'
+import { getPlateSegments, normalizeLicensePlate } from '../utils/licensePlate'
 
 interface FeedbackMessage {
   type: 'success' | 'error'
@@ -113,6 +113,13 @@ export const Dashboard: React.FC = () => {
     () => positions.find((position) => position.position_index === selectedPositionIndex),
     [positions, selectedPositionIndex]
   )
+
+  const detailPlateSegments = useMemo(() => {
+    if (!detail) {
+      return null
+    }
+    return getPlateSegments(detail.license_plate)
+  }, [detail])
 
   const handleSelectVehicle = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle)
@@ -294,8 +301,19 @@ export const Dashboard: React.FC = () => {
             {detail && (
               <div className="rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm space-y-3 sm:space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold">{detail.license_plate}</h2>
+                  <div className="space-y-1">
+                    {detailPlateSegments && (
+                      <div
+                        className="detail-plate-card"
+                        aria-label={t('vehicles.plateLabel') + ': ' + detail.license_plate}
+                      >
+                        {detailPlateSegments.map((segment, index) => (
+                          <span key={`detail-plate-${index}`} className="detail-plate-segment">
+                            {segment || '\u00A0'}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {detail.description && (
                       <p className="text-sm text-slate-500 dark:text-slate-400">{detail.description}</p>
                     )}

@@ -86,7 +86,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
               {vehicles.length === 0 ? (
                 <p className="text-sm text-slate-500">{t('vehicles.empty')}</p>
               ) : (
-                <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-2 auto-rows-[minmax(0,1fr)]">
+                <div className="grid grid-cols-3 gap-2 lg:grid-cols-2 auto-rows-[minmax(0,1fr)]">
                   {vehicles.map((vehicle) => {
                     const segments = getPlateSegments(vehicle.license_plate)
 
