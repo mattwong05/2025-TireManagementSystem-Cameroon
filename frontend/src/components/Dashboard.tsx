@@ -24,7 +24,7 @@ export const Dashboard: React.FC = () => {
   const [detail, setDetail] = useState<VehicleDetail | null>(null)
   const [positions, setPositions] = useState<WheelPosition[]>([])
   const [selectedPositionIndex, setSelectedPositionIndex] = useState<number | undefined>(undefined)
-  const [saving, setSaving] = useState(false)
+  const [positionUpdatingIndex, setPositionUpdatingIndex] = useState<number | null>(null)
   const [feedback, setFeedback] = useState<FeedbackMessage | null>(null)
   const [lastUpdatedMap, setLastUpdatedMap] = useState<Record<number, string>>({})
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
@@ -93,7 +93,7 @@ export const Dashboard: React.FC = () => {
       setVehicleForm({ license_plate: '', description: '' })
     }
     setEditingVehicle(false)
-  }, [detail])
+  }, [detail?.id, detail?.license_plate, detail?.description])
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -152,6 +152,45 @@ export const Dashboard: React.FC = () => {
     )
   }
 
+  const syncDetailPositions = (updatedPosition: WheelPosition) => {
+    setPositions((prev) =>
+      prev.map((item) => (item.position_index === updatedPosition.position_index ? updatedPosition : item))
+    )
+    setDetail((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        wheel_positions: prev.wheel_positions.map((item) =>
+          item.position_index === updatedPosition.position_index ? updatedPosition : item
+        )
+      }
+    })
+  }
+
+  const persistPosition = async (positionIndex: number) => {
+    if (!detail) return
+    const target = positions.find((item) => item.position_index === positionIndex)
+    if (!target) return
+    setPositionUpdatingIndex(positionIndex)
+    try {
+      const normalizedSerial = target.tire_serial?.trim()
+      const payload = {
+        tire_serial: normalizedSerial ? normalizedSerial.toUpperCase() : null
+      }
+      const { data } = await apiClient.put<WheelPosition>(
+        `/vehicles/${detail.id}/wheel-positions/${positionIndex}`,
+        payload
+      )
+      syncDetailPositions(data)
+      setFeedback({ type: 'success', message: t('notifications.saved') })
+      setLastUpdatedMap((prev) => ({ ...prev, [detail.id]: new Date().toLocaleString() }))
+    } catch (error) {
+      setFeedback({ type: 'error', message: t('notifications.error') })
+    } finally {
+      setPositionUpdatingIndex(null)
+    }
+  }
+
   const handleVehicleFieldChange = (field: 'license_plate' | 'description', value: string) => {
     if (field === 'license_plate') {
       setVehicleForm((prev) => ({ ...prev, license_plate: normalizeLicensePlate(value) }))
@@ -207,40 +246,20 @@ export const Dashboard: React.FC = () => {
     }
   }
 
-  const handleRemove = (positionIndex: number) => {
-    setPositions((prev) =>
-      prev.map((item) =>
-        item.position_index === positionIndex ? { ...item, tire_serial: null } : item
-      )
-    )
-  }
-
-  const handleSave = async () => {
+  const handleRemove = async (positionIndex: number) => {
     if (!detail) return
-    setSaving(true)
+    setPositionUpdatingIndex(positionIndex)
     try {
-      const payload = {
-        positions: positions.map((item) => ({
-          position_index: item.position_index,
-          tire_serial: item.tire_serial || null
-        }))
-      }
-      const { data } = await apiClient.post<VehicleDetail>(
-        `/vehicles/${detail.id}/wheel-positions/bulk`,
-        payload
+      const { data } = await apiClient.delete<WheelPosition>(
+        `/vehicles/${detail.id}/wheel-positions/${positionIndex}`
       )
-      const normalizedDetail: VehicleDetail = {
-        ...data,
-        license_plate: normalizeLicensePlate(data.license_plate)
-      }
-      setDetail(normalizedDetail)
-      setPositions(normalizedDetail.wheel_positions)
+      syncDetailPositions(data)
       setFeedback({ type: 'success', message: t('notifications.saved') })
       setLastUpdatedMap((prev) => ({ ...prev, [detail.id]: new Date().toLocaleString() }))
     } catch (error) {
       setFeedback({ type: 'error', message: t('notifications.error') })
     } finally {
-      setSaving(false)
+      setPositionUpdatingIndex(null)
     }
   }
 
@@ -303,15 +322,20 @@ export const Dashboard: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
                     {detailPlateSegments && (
-                      <div
-                        className="detail-plate-card"
-                        aria-label={t('vehicles.plateLabel') + ': ' + detail.license_plate}
-                      >
-                        {detailPlateSegments.map((segment, index) => (
-                          <span key={`detail-plate-${index}`} className="detail-plate-segment">
-                            {segment || '\u00A0'}
-                          </span>
-                        ))}
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {t('vehicles.currentPlate')}
+                        </p>
+                        <div
+                          className="detail-plate-card"
+                          aria-label={t('vehicles.plateLabel') + ': ' + detail.license_plate}
+                        >
+                          {detailPlateSegments.map((segment, index) => (
+                            <span key={`detail-plate-${index}`} className="detail-plate-segment">
+                              {segment || '\u00A0'}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                     {detail.description && (
@@ -321,23 +345,13 @@ export const Dashboard: React.FC = () => {
                       <p className="text-xs text-slate-400">{t('dashboard.lastUpdated', { time: lastUpdatedMap[detail.id] })}</p>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setEditingVehicle((value) => !value)}
-                      className="rounded-md border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm font-semibold"
-                    >
-                      {editingVehicle ? t('vehicles.cancelEdit') : t('vehicles.edit')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSave}
-                      disabled={saving}
-                      className="rounded-md bg-amber-500 text-white px-4 py-2 font-semibold hover:bg-amber-600 disabled:opacity-60"
-                    >
-                      {saving ? t('dashboard.saving') : t('dashboard.save')}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditingVehicle((value) => !value)}
+                    className="rounded-md border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm font-semibold"
+                  >
+                    {editingVehicle ? t('vehicles.cancelEdit') : t('vehicles.edit')}
+                  </button>
                 </div>
                 {editingVehicle && (
                   <form className="space-y-3" onSubmit={handleUpdateVehicle}>
@@ -398,15 +412,22 @@ export const Dashboard: React.FC = () => {
               </div>
               <WheelDetailPanel
                 position={selectedPosition}
-                onUpdate={(serial) => {
+                onSerialChange={(serial) => {
                   if (!selectedPosition) return
                   handlePositionUpdate(selectedPosition.position_index, serial)
+                }}
+                onInstall={() => {
+                  if (!selectedPosition) return
+                  persistPosition(selectedPosition.position_index)
                 }}
                 onRemove={() => {
                   if (!selectedPosition) return
                   handleRemove(selectedPosition.position_index)
                 }}
                 disabled={!detail}
+                loading={
+                  !!selectedPosition && positionUpdatingIndex === selectedPosition.position_index
+                }
               />
             </div>
           </div>

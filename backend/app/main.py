@@ -7,10 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas, security
+from . import crud, migrations, models, schemas, security
 from .database import engine
 from .deps import get_current_user, get_db
 
+migrations.apply_migrations(engine)
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(

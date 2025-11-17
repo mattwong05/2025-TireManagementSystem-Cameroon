@@ -12,7 +12,6 @@ interface WheelPositionCardProps {
 export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, isSpare, selected, onSelect }) => {
   const { t } = useTranslation()
   const label = isSpare ? t('wheels.spare', { index: position.position_index - 18 }) : t('wheels.position', { index: position.position_index })
-  const status = position.tire_serial ? t('wheels.statusInstalled') : t('wheels.statusEmpty')
   const serialRef = useRef<HTMLSpanElement>(null)
   const appliedFontSizeRef = useRef<number | null>(null)
 
@@ -130,7 +129,6 @@ export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, 
       >
         {position.tire_serial || '--'}
       </span>
-      <span className="hidden text-xs text-slate-400 sm:block">{status}</span>
     </button>
   )
 }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, constr
@@ -53,6 +54,7 @@ class WheelPositionRead(WheelPositionBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    installed_at: Optional[datetime]
 
 
 class WheelPositionUpdate(BaseModel):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -31,6 +31,7 @@ class WheelPosition(Base):
     vehicle_id = Column(Integer, ForeignKey("vehicles.id", ondelete="CASCADE"), nullable=False)
     position_index = Column(Integer, nullable=False)
     tire_serial = Column(String(64), nullable=True)
+    installed_at = Column(DateTime(timezone=True), nullable=True)
 
     vehicle = relationship("Vehicle", back_populates="wheel_positions")
 

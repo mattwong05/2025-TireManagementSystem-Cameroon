@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -95,7 +96,14 @@ def get_wheel_position(
 def update_wheel_position(
     db: Session, wheel_position: models.WheelPosition, update_data: schemas.WheelPositionUpdate
 ) -> models.WheelPosition:
-    wheel_position.tire_serial = update_data.tire_serial
+    previous_serial = wheel_position.tire_serial
+    new_serial = update_data.tire_serial
+    wheel_position.tire_serial = new_serial
+    if new_serial:
+        if previous_serial != new_serial:
+            wheel_position.installed_at = datetime.now(timezone.utc)
+    else:
+        wheel_position.installed_at = None
     db.add(wheel_position)
     db.commit()
     db.refresh(wheel_position)
@@ -115,7 +123,13 @@ def bulk_update_positions(
             )
             db.add(wp)
             indexed[item.position_index] = wp
+        previous_serial = wp.tire_serial
         wp.tire_serial = item.tire_serial
+        if item.tire_serial:
+            if previous_serial != item.tire_serial:
+                wp.installed_at = datetime.now(timezone.utc)
+        else:
+            wp.installed_at = None
         db.add(wp)
     db.commit()
     db.refresh(vehicle)

@@ -50,7 +50,8 @@ body {
 
 .wheel-size {
   width: clamp(4rem, 16vw, 6.5rem);
-  height: clamp(3.25rem, 14vw, 5.5rem);
+  height: clamp(4rem, 16vw, 5.5rem);
+  min-height: 4rem;
   flex: 0 0 auto;
 }
 

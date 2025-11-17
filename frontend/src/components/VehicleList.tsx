@@ -29,6 +29,17 @@ export const VehicleList: React.FC<VehicleListProps> = ({
   const [description, setDescription] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showCreateForm, setShowCreateForm] = useState(false)
+
+  const toggleCreateForm = () => {
+    setShowCreateForm((value) => {
+      const next = !value
+      if (!next) {
+        setError(null)
+      }
+      return next
+    })
+  }
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -43,6 +54,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
       setLicensePlate('')
       setDescription('')
       setError(null)
+      setShowCreateForm(false)
     } catch (err) {
       setError('Failed to add vehicle')
     } finally {
@@ -115,39 +127,56 @@ export const VehicleList: React.FC<VehicleListProps> = ({
                 </div>
               )}
             </div>
-            <form onSubmit={handleCreate} className="space-y-3 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
-              <div className="space-y-1">
-                <label className="block text-sm font-medium" htmlFor="plate-input">
-                  {t('vehicles.plateLabel')}
-                </label>
-                <input
-                  id="plate-input"
-                  value={licensePlate}
-                  onChange={(event) => setLicensePlate(normalizeLicensePlate(event.target.value))}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm"
-                  placeholder="AB 123 CD"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-sm font-medium" htmlFor="description-input">
-                  {t('vehicles.description')}
-                </label>
-                <input
-                  id="description-input"
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm"
-                />
-              </div>
-              {error && <p className="text-xs text-red-500">{error}</p>}
+            <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4">
               <button
-                type="submit"
-                disabled={creating}
-                className="w-full rounded-lg bg-slate-900 text-white py-2 font-semibold hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 disabled:opacity-60"
+                type="button"
+                onClick={toggleCreateForm}
+                className="mb-3 w-full rounded-lg bg-slate-900 text-white py-2 text-sm font-semibold hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900"
               >
-                {creating ? '...' : t('vehicles.add')}
+                {showCreateForm ? t('vehicles.cancelEdit') : t('vehicles.add')}
               </button>
-            </form>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-out ${
+                  showCreateForm
+                    ? 'max-h-[320px] opacity-100 translate-y-0'
+                    : 'max-h-0 opacity-0 translate-y-4 pointer-events-none'
+                }`}
+              >
+                <form onSubmit={handleCreate} className="space-y-3">
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium" htmlFor="plate-input">
+                      {t('vehicles.plateLabel')}
+                    </label>
+                    <input
+                      id="plate-input"
+                      value={licensePlate}
+                      onChange={(event) => setLicensePlate(normalizeLicensePlate(event.target.value))}
+                      className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm"
+                      placeholder="AB 123 CD"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium" htmlFor="description-input">
+                      {t('vehicles.description')}
+                    </label>
+                    <input
+                      id="description-input"
+                      value={description}
+                      onChange={(event) => setDescription(event.target.value)}
+                      className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm"
+                    />
+                  </div>
+                  {error && <p className="text-xs text-red-500">{error}</p>}
+                  <button
+                    type="submit"
+                    disabled={creating}
+                    className="w-full rounded-lg bg-amber-500 text-white py-2 font-semibold hover:bg-amber-600 disabled:opacity-60"
+                  >
+                    {creating ? '...' : t('vehicles.add')}
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </aside>
