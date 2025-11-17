@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, constr
 
 
 MAX_VEHICLES = 1000
-WHEEL_POSITIONS = 20
+WHEEL_POSITIONS = 24
 
 
 class Token(BaseModel):

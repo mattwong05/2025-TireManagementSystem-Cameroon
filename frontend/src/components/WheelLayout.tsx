@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WheelPosition } from '../types'
 import { WheelPositionCard } from './WheelPositionCard'
+import { SPARE_START_INDEX } from '../constants'
 
 interface WheelLayoutProps {
   positions: WheelPosition[]
@@ -14,13 +15,16 @@ const axleLayout: Array<{ left: Array<number | null>; right: Array<number | null
   { left: [3, 4], right: [5, 6] },
   { left: [7, 8], right: [9, 10] },
   { left: [11, 12], right: [13, 14] },
-  { left: [15, 16], right: [17, 18] }
+  { left: [15, 16], right: [17, 18] },
+  { left: [19, 20], right: [21, 22] }
 ]
 
 export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId, onSelect }) => {
   const { t } = useTranslation()
   const map = useMemo(() => new Map(positions.map((position) => [position.position_index, position])), [positions])
-  const sparePositions = positions.filter((position) => position.position_index > 18)
+  const sparePositions = positions
+    .filter((position) => position.position_index >= SPARE_START_INDEX)
+    .sort((a, b) => a.position_index - b.position_index)
 
   const renderCell = (index: number | null) => {
     if (!index) {

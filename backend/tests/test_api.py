@@ -72,13 +72,13 @@ def test_vehicle_lifecycle(client: TestClient) -> None:
     )
     assert bulk_response.status_code == 200
     body = bulk_response.json()
-    assert len(body["wheel_positions"]) == 20
+    assert len(body["wheel_positions"]) == 24
     assert any(wp["tire_serial"] == "TIRE-A" for wp in body["wheel_positions"])
 
     detail_response = client.get(f"/vehicles/{vehicle_id}", headers=headers)
     assert detail_response.status_code == 200
     detail_body = detail_response.json()
-    assert len(detail_body["wheel_positions"]) == 20
+    assert len(detail_body["wheel_positions"]) == 24
 
     delete_response = client.delete(f"/vehicles/{vehicle_id}", headers=headers)
     assert delete_response.status_code == 204

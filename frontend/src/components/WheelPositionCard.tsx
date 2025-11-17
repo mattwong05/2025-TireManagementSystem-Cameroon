@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WheelPosition } from '../types'
+import { SPARE_START_INDEX } from '../constants'
 
 interface WheelPositionCardProps {
   position: WheelPosition
@@ -11,7 +12,9 @@ interface WheelPositionCardProps {
 
 export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, isSpare, selected, onSelect }) => {
   const { t } = useTranslation()
-  const label = isSpare ? t('wheels.spare', { index: position.position_index - 18 }) : t('wheels.position', { index: position.position_index })
+  const label = isSpare
+    ? t('wheels.spare', { index: position.position_index - SPARE_START_INDEX + 1 })
+    : t('wheels.position', { index: position.position_index })
   const serialRef = useRef<HTMLSpanElement>(null)
   const appliedFontSizeRef = useRef<number | null>(null)
 

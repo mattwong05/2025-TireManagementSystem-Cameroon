@@ -1,0 +1,3 @@
+export const MAIN_WHEEL_COUNT = 22
+export const TOTAL_WHEEL_POSITIONS = 24
+export const SPARE_START_INDEX = MAIN_WHEEL_COUNT + 1
