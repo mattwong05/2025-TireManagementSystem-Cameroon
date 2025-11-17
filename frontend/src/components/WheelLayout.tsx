@@ -11,10 +11,10 @@ interface WheelLayoutProps {
 
 const axleLayout: Array<{ left: Array<number | null>; right: Array<number | null> }> = [
   { left: [null, 1], right: [2, null] },
-  { left: [3, 5], right: [4, 6] },
-  { left: [7, 9], right: [8, 10] },
-  { left: [11, 13], right: [12, 14] },
-  { left: [15, 17], right: [16, 18] }
+  { left: [3, 4], right: [5, 6] },
+  { left: [7, 8], right: [9, 10] },
+  { left: [11, 12], right: [13, 14] },
+  { left: [15, 16], right: [17, 18] }
 ]
 
 export const WheelLayout: React.FC<WheelLayoutProps> = ({ positions, selectedId, onSelect }) => {
