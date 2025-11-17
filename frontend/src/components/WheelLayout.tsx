@@ -10,7 +10,7 @@ interface WheelLayoutProps {
 }
 
 const axleLayout: Array<{ left: Array<number | null>; right: Array<number | null> }> = [
-  { left: [null, 2], right: [1, null] },
+  { left: [null, 1], right: [2, null] },
   { left: [3, 5], right: [4, 6] },
   { left: [7, 9], right: [8, 10] },
   { left: [11, 13], right: [12, 14] },

@@ -13,8 +13,6 @@
   "dashboard": {
     "greeting": "您好，{{name}}",
     "logout": "退出登录",
-    "save": "保存全部变更",
-    "saving": "保存中…",
     "lastUpdated": "最近更新 {{time}}"
   },
   "vehicles": {
@@ -22,7 +20,7 @@
     "search": "按车牌搜索",
     "empty": "暂无车辆",
     "add": "新增车辆",
-    "edit": "编辑",
+    "edit": "修改车牌信息",
     "cancelEdit": "取消",
     "update": "保存车辆信息",
     "updating": "保存中…",
@@ -31,7 +29,8 @@
     "plateLabel": "车牌号码",
     "deleteConfirm": "确定删除车辆 {{plate}}？该操作无法恢复。",
     "plateFormat": "格式 AB 123 CD",
-    "description": "车辆描述"
+    "description": "车辆描述",
+    "currentPlate": "当前车牌"
   },
   "wheels": {
     "title": "轮位布局",
@@ -39,12 +38,16 @@
     "spare": "备胎 {{index}}",
     "tireSerial": "轮胎编号",
     "install": "安装",
+    "installing": "安装中…",
     "remove": "卸下",
+    "removing": "卸下中…",
     "placeholder": "扫描或输入编号",
     "statusEmpty": "空位",
     "statusInstalled": "已安装",
     "mobileToggle": "车辆列表",
-    "selectPrompt": "请选择轮位进行编辑"
+    "selectPrompt": "请选择轮位进行编辑",
+    "installedAt": "安装时间：{{time}}",
+    "neverInstalled": "尚未安装"
   },
   "theme": {
     "label": "主题",

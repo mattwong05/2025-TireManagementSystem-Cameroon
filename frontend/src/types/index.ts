@@ -13,6 +13,7 @@ export interface WheelPosition {
   id: number
   position_index: number
   tire_serial?: string | null
+  installed_at?: string | null
 }
 
 export interface VehicleDetail extends Vehicle {

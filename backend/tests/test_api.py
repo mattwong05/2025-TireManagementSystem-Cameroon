@@ -39,7 +39,9 @@ def test_vehicle_lifecycle(client: TestClient) -> None:
         headers=headers,
     )
     assert update_response.status_code == 200
-    assert update_response.json()["tire_serial"] == "TIRE001"
+    update_body = update_response.json()
+    assert update_body["tire_serial"] == "TIRE001"
+    assert update_body["installed_at"] is not None
 
     vehicle_update = client.put(
         f"/vehicles/{vehicle_id}",
@@ -54,7 +56,9 @@ def test_vehicle_lifecycle(client: TestClient) -> None:
         headers=headers,
     )
     assert remove_response.status_code == 200
-    assert remove_response.json()["tire_serial"] is None
+    removed_body = remove_response.json()
+    assert removed_body["tire_serial"] is None
+    assert removed_body["installed_at"] is None
 
     bulk_response = client.post(
         f"/vehicles/{vehicle_id}/wheel-positions/bulk",
