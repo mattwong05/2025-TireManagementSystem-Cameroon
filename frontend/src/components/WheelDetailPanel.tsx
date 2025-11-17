@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { WheelPosition } from '../types'
 import { formatDateTime } from '../utils/date'
+import { SPARE_START_INDEX } from '../constants'
 
 interface WheelDetailPanelProps {
   position?: WheelPosition
@@ -30,8 +31,10 @@ export const WheelDetailPanel: React.FC<WheelDetailPanelProps> = ({
     )
   }
 
-  const isSpare = position.position_index > 18
-  const label = isSpare ? t('wheels.spare', { index: position.position_index - 18 }) : t('wheels.position', { index: position.position_index })
+  const isSpare = position.position_index >= SPARE_START_INDEX
+  const label = isSpare
+    ? t('wheels.spare', { index: position.position_index - SPARE_START_INDEX + 1 })
+    : t('wheels.position', { index: position.position_index })
 
   return (
     <div className="rounded-xl bg-white dark:bg-slate-800 p-4 shadow-sm space-y-3">
