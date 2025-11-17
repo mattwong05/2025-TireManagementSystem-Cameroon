@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WheelPosition } from '../types'
-import { formatDateTime } from '../utils/date'
 
 interface WheelPositionCardProps {
   position: WheelPosition
@@ -13,7 +12,6 @@ interface WheelPositionCardProps {
 export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, isSpare, selected, onSelect }) => {
   const { t } = useTranslation()
   const label = isSpare ? t('wheels.spare', { index: position.position_index - 18 }) : t('wheels.position', { index: position.position_index })
-  const status = position.tire_serial ? t('wheels.statusInstalled') : t('wheels.statusEmpty')
   const serialRef = useRef<HTMLSpanElement>(null)
   const appliedFontSizeRef = useRef<number | null>(null)
 
@@ -118,10 +116,6 @@ export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, 
     }
   }, [position.tire_serial])
 
-  const installTime = position.installed_at
-    ? t('wheels.installedAt', { time: formatDateTime(position.installed_at) })
-    : t('wheels.neverInstalled')
-
   return (
     <button
       type="button"
@@ -135,8 +129,6 @@ export const WheelPositionCard: React.FC<WheelPositionCardProps> = ({ position, 
       >
         {position.tire_serial || '--'}
       </span>
-      <span className="hidden text-[11px] text-slate-500 dark:text-slate-400 sm:block">{status}</span>
-      <span className="text-[10px] text-slate-400 dark:text-slate-500">{installTime}</span>
     </button>
   )
 }
