@@ -28,7 +28,7 @@
     "deleting": "Deleting...",
     "plateLabel": "License plate",
     "deleteConfirm": "Delete vehicle {{plate}}? This cannot be undone.",
-    "plateFormat": "Format AB 123 CD",
+    "plateFormat": "Format ABCD 123 AB",
     "description": "Description",
     "currentPlate": "Current plate"
   },
