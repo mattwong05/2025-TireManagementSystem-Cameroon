@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WheelPosition } from '../types'
 import { formatDateTime } from '../utils/date'
@@ -22,6 +22,18 @@ export const WheelDetailPanel: React.FC<WheelDetailPanelProps> = ({
   loading
 }) => {
   const { t } = useTranslation()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!position || disabled || loading) {
+      return
+    }
+    const input = inputRef.current
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  }, [position?.position_index, disabled, loading])
 
   if (!position) {
     return (
@@ -58,6 +70,7 @@ export const WheelDetailPanel: React.FC<WheelDetailPanelProps> = ({
         <input
           id="tire-serial"
           className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2"
+          ref={inputRef}
           value={position.tire_serial || ''}
           onChange={(event) => onSerialChange(event.target.value)}
           placeholder={t('wheels.placeholder')}

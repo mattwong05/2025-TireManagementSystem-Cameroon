@@ -17,33 +17,12 @@ export const getPlateSegments = (plate: string): string[] => {
     return padToThree(directParts)
   }
 
-  if (directParts.length === 2) {
-    const [first, second] = directParts
-    if (second.length <= 3) {
-      return padToThree([first, second])
-    }
-    return padToThree([first, second.slice(0, 3), second.slice(3)])
-  }
+  const compact = directParts.join('')
+  const first = compact.slice(0, 4)
+  const middle = compact.slice(4, 7)
+  const last = compact.slice(7)
 
-  const compact = normalized.replace(/\s+/g, '')
-  if (compact.length <= 3) {
-    return padToThree([compact])
-  }
-
-  const region = compact.slice(0, 2)
-  const rest = compact.slice(2)
-  const digitsMatch = rest.match(/^(\d{1,4})(.*)$/)
-  if (digitsMatch) {
-    const [, digits, suffix] = digitsMatch
-    return padToThree([region, digits, suffix])
-  }
-
-  const baseSize = Math.ceil(compact.length / 3)
-  return padToThree([
-    compact.slice(0, baseSize),
-    compact.slice(baseSize, baseSize * 2),
-    compact.slice(baseSize * 2)
-  ])
+  return padToThree([first, middle, last])
 }
 
 export const normalizeLicensePlate = (value: string): string => value.replace(/\s+/g, '').toUpperCase()
