@@ -365,7 +365,7 @@ export const Dashboard: React.FC = () => {
                           value={vehicleForm.license_plate}
                           onChange={(event) => handleVehicleFieldChange('license_plate', event.target.value)}
                           className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2"
-                          placeholder="AB 123 CD"
+                          placeholder="ABCD 123 AB"
                           required
                         />
                       </div>

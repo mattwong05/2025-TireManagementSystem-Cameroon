@@ -28,7 +28,7 @@
     "deleting": "删除中…",
     "plateLabel": "车牌号码",
     "deleteConfirm": "确定删除车辆 {{plate}}？该操作无法恢复。",
-    "plateFormat": "格式 AB 123 CD",
+    "plateFormat": "格式 ABCD 123 AB",
     "description": "车辆描述",
     "currentPlate": "当前车牌"
   },
